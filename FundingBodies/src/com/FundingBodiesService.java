@@ -37,7 +37,7 @@ public class FundingBodiesService {
 							@FormParam("postDate") String postdate, 
 							@FormParam("postTime") String posttime) 
 	{ 
-			String output = fundObj.insertItem(title, content, postdate, posttime); 
+			String output = fundObj.insert Item(title, content, postdate, posttime); 
 			return output; 
 	}
 	
