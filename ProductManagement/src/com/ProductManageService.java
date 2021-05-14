@@ -27,7 +27,7 @@ ProductManage product_obj=new ProductManage();
 	@GET
 	@Path("/")
 	@Produces(MediaType.TEXT_HTML)
-	public String readPosts()
+	public String readProducts()
 	{
 		return product_obj.readProducts();
 	}
@@ -36,9 +36,10 @@ ProductManage product_obj=new ProductManage();
 	@Path("/")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Produces(MediaType.TEXT_PLAIN)
-	public String createPost(
+	public String createProduct(
 			@FormParam("productCode") String productCode,
 			@FormParam("productName") String productName,
+			//changed
 			@FormParam("productPrice") String productPrice,
 			@FormParam("productDesc") String productDesc
 			) {
@@ -59,6 +60,7 @@ ProductManage product_obj=new ProductManage();
 		String ID = postObj.get("pID").getAsString();
 		String productCode = postObj.get("productCode").getAsString();
 		String productName = postObj.get("productName").getAsString();
+		//change
 		String productPrice = postObj.get("productPrice").getAsString();
 		String productDesc = postObj.get("productDesc").getAsString();
 		
@@ -71,13 +73,15 @@ ProductManage product_obj=new ProductManage();
 	@Path("/")
 	@Consumes(MediaType.APPLICATION_XML)
 	@Produces(MediaType.TEXT_PLAIN)
+	
 	public String deleteItem(String itemData)
 	{
-		Document doc= Jsoup.parse(itemData,"",Parser.xmlParser());
+		Document doc= Jsoup.parse(itemData, "", Parser.xmlParser());
 		
-		String itemID=doc.select("pID").text();
+		String itemID = doc.select("itemID").text();
 		
 		String output=product_obj.deleteProduct(itemID);
+		
 		return output;
 	}
 }

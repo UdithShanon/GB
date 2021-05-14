@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class ProductManage {
+	
 	private Connection connect()
 	{
 		Connection con=null;
@@ -23,6 +24,7 @@ public class ProductManage {
 	}
 	
 	public String createProduct(String productCode,String productName, String productPrice, String productDesc) {
+		
 		String output="";
 		
 		try {
@@ -34,10 +36,10 @@ public class ProductManage {
 			}
 			//LocalDate date= LocalDate.now();
 			//LocalTime time= LocalTime.now();
-			String  query= "insert into products('productCode','productName','productPrice','productDesc')"
+			String query = " insert into products(productCode,productName,productPrice,productDesc)"
 							+
-							" values(?,?,?,?) ";
-			PreparedStatement ps=con.prepareStatement(query);
+							" values(?, ?, ?, ?)";
+			PreparedStatement ps = con.prepareStatement(query);
 			
 			ps.setString(1, productCode);
 			ps.setString(2, productName);
@@ -47,11 +49,14 @@ public class ProductManage {
 			ps.execute();
 			con.close();
 			
+			String newProudct = readProducts();
+			
 			output="Insert Success";
+			output="{\"status\":\"success\", \"data\": \"" + newProudct + "\"}";
 		}
 		catch (Exception e) {
 			// TODO: handle exception
-			output="Error while inserting the Item";
+			output = "{\"status\":\"error\", \"data\": \"Error while inserting the order.\"}";
 			System.err.println(e.getMessage());
 		}
 		
@@ -68,7 +73,8 @@ public class ProductManage {
 			{
 				return "Error";
 			}
-			output="<table><tr><th>Product ID</th><th>Product Code</th><th>Product Name</th><th>Product Price</th><th>Product Description</th><th>Update</th><th>Remove</th></tr>";
+			output="<table border='1'><tr><th>Product ID</th><th>Product Code</th><th>Product Name</th><th>Product Price</th><th>Product Description</th><th>Update</th><th>Remove</th></tr>";
+			//changed
 			String query="select * from products";
 			Statement st= con.createStatement();
 			ResultSet rs= st.executeQuery(query);
@@ -78,22 +84,30 @@ public class ProductManage {
 				String Product_id= Integer.toString(rs.getInt("id"));
 				String Product_code= rs.getString("productCode");
 				String Product_name = rs.getString("productName");
-				String Product_price = rs.getString("productPrice");// How to Get Date as A String - Doubt
-				String Product_description = rs.getString("productDesc");// How to Get Date as A String - Doubt
+				//changed
+				double Product_price = rs.getDouble("productPrice");
+				String Product_description = rs.getString("productDesc");
 				
 				output +="<tr><td>"+Product_id+"</td>";
-				output +="<tr><td>"+Product_code+"</td>";
-				output +="<tr><td>"+Product_name+"</td>";
-				output +="<tr><td>"+Product_price+"</td>";
-				output +="<tr><td>"+Product_description+"</td>";
+				output +="<td>"+Product_code+"</td>";
+				output +="<td>"+Product_name+"</td>";
+				//changed
+				output +="<td>"+"Rs."+Product_price+"</td>";
+				output +="<td>"+Product_description+"</td>";
 				
-				output +="<td><input name=\\\"btnUpdate\\\" type=\\\"button\\\" \r\n" + 
-						" value=\\\"Update\\\" class=\\\"btn btn-secondary\\\"></td>\"\r\n" + 
-						" + \"<td><form method=\\\"post\\\" action=\\\"posts.jsp\\\">\"\r\n" + 
-						" + \"<input name=\\\"btnRemove\\\" type=\\\"submit\\\" value=\\\"Remove\\\" \r\n" + 
-						" class=\\\"btn btn-danger\\\">\"\r\n" + 
-						" + \"<input name=\\\"id\\\" type=\\\"hidden\\\" value=\\\"\" + id\r\n" + 
-						" + \"\\\">\" + \"</form></td></tr>";
+				
+				/*
+				 * output += "<td><input name='btnUpdate' type='button' value='Update'</td>" +
+				 * "<td><form method='post' action='items.jsp'>" +
+				 * "<input name='btnRemove' id='btnRemove' type='submit' value='Remove'>" +
+				 * "<input name='itemID' type='hidden' value='" + Product_id + "'>" +
+				 * "</form></td></tr>";
+				 */
+				
+				// buttons
+				 output += "<td><input name='btnUpdate' type='button' value='Update' class='btnUpdate btn btn-secondary'></td>"
+						 + "<td><button class='btnRemove btn btn-danger' name='btnRemove' id ='btnRemove' value='"+ Product_id +"' >Remove</button></td></tr>";
+				 
 				
 			}
 			con.close();
@@ -106,8 +120,8 @@ public class ProductManage {
 		return output;
 	}
 	
-	
-	public String updatePost(String ID, String productCode,String productName, String productPrice, String productDesc) 
+	//change
+	public String updatePost(String ID, String productCode, String productName, String string, String productDesc) 
 	 { 
 	 String output = ""; 
 	 try
@@ -118,30 +132,36 @@ public class ProductManage {
 	 // create a prepared statement
 	 //LocalDate date= LocalDate.now();
 	 //LocalTime time= LocalTime.now();
+	 //change
 	 String query = "UPDATE products SET productCode=?,productName=?,productPrice=?,productDesc=? WHERE id=?"; 
 	 PreparedStatement preparedStmt = con.prepareStatement(query); 
 	 // binding values
 	 preparedStmt.setString(1, productCode); 
 	 preparedStmt.setString(2, productName); 
-	 preparedStmt.setString(3, productPrice); 
+	 //change
+	 preparedStmt.setString(3, string); 
 	 preparedStmt.setString(4, productDesc); 
 	 preparedStmt.setInt(5, Integer.parseInt(ID)); 
 	 // execute the statement
 	 preparedStmt.execute(); 
 	 con.close(); 
-	 output = "Updated successfully"; 
+	 //output = "Updated successfully"; 
+	 
+	 String newProudct = readProducts();
+	 output="{\"status\":\"success\", \"data\": \"" + newProudct + "\"}";
+	 
 	 } 
 	 catch (Exception e) 
 	 { 
-	 output = "Error while updating the item."; 
-	 System.err.println(e.getMessage()); 
+		 output = "{\"status\":\"error\", \"data\": \"Error while inserting the order.\"}";
+		 System.err.println(e.getMessage()); 
 	 } 
 	 return output; 
 	 } 
 	
 	
 	
-	public String deleteProduct(String ID) 
+	public String deleteProduct(String itemID) 
 	 { 
 	 String output = ""; 
 	 try
@@ -150,19 +170,28 @@ public class ProductManage {
 	 if (con == null) 
 	 {return "Error while connecting to the database for deleting."; } 
 	 // create a prepared statement
-	 String query = "delete from products where id=?"; 
+	 //change
+	 String query = "delete from product where id = ?"; 
+	 
 	 PreparedStatement preparedStmt = con.prepareStatement(query); 
+	 
 	 // binding values
-	 preparedStmt.setInt(1, Integer.parseInt(ID)); 
+	 preparedStmt.setInt(1, Integer.parseInt(itemID)); 
+	 
 	 // execute the statement
 	 preparedStmt.execute(); 
 	 con.close(); 
-	 output = "Deleted successfully"; 
+	 
+	 //output = "Deleted successfully"; 
+	 String newProudct = readProducts();
+	 output="{\"status\":\"success\", \"data\": \"" + newProudct + "\"}";
+	 
 	 } 
 	 catch (Exception e) 
 	 { 
-	 output = "Error while deleting the item."; 
-	 System.err.println(e.getMessage()); 
+	 //output = "Error while deleting the item."; 
+		 output = "{\"status\":\"error\", \"data\": \"Error while deleting the order.\"}";
+		 System.err.println(e.getMessage()); 
 	 } 
 	 return output; 
 	 }
